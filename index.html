@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<script type="text/javascript" charset="utf-8" src="phonegap.js"></script>
+<link rel="stylesheet" href="css/jquery.mobile-1.4.5.min.css" />
+<link rel="stylesheet" href="css/jquery-ui.css" />
+<script src="js/jquery.min.js"></script>
+<script src="js/jquery-ui.js"></script>
+<script src="js/jquery.mobile-1.4.5.min.js"></script>
+<title>BOTANERO"BENDITO DIOS"</title>
+<script type="text/javascript">
+$(document).ready(function inicio(){
+
+/////Registrar Productos
+  
+   var btnGuardar=$("#produc");
+  btnGuardar.click(function produc(){
+  var nom=$("#nombre").val();
+  var precio=parseInt($("#precio").val());
+  var cantidad=$("#cantidad").val();
+  var descripcion=$("#descripcion").val();
+ 
+  if(nom=="" || precio=="" || cantidad=="" || descripcion=="" ){
+	alert("Ingresa información en todos los campos");
+      }else{
+    $.ajax({
+    type:"POST",
+  url:"guardarPro.php",
+    data:"nombre="+nom+"&precio="+precio+"&cantidad="+cantidad+"&descripcion="+descripcion,
+    success: registro
+    });
+      }
+    function registro(datos){
+    alert(datos);
+    	}
+   });
+  ///////Finaliza registro de productos
+
+////////Registrar Clientes
+
+  var btnGuardar=$("#client");
+  btnGuardar.click(function produc(){
+  var nombre=$("#nombre").val();
+  var edad=$("#edad").val();
+  var direccion=$("#direccion").val();
+  var telefono=$("#telefono").val();
+  
+
+  
+    $.ajax({
+    type:"POST",
+    url:"guardarCli.php",
+    data:"nombre="+nombre+"&edad="+edad+"&direccion="+direccion+"&telefono="+telefono,
+    success: registro
+    });
+    
+    function registro(datos){
+    alert(datos);
+    }
+  });
+
+  
+//////////////finaliza registros de productos y clientes
+
+
+//////////consultar los registros de clientes y productos
+
+
+//////////productos
+   var btnConsulta=$("#pro");
+  btnConsulta.click(function cons(){  
+    $.ajax({
+    type:"POST",
+    url:"consultarPRO.php",
+    data:"",
+    success: consultaDatos
+    });
+    
+    function consultaDatos(datos){
+    var respDatos=$.parseJSON(datos);   
+    var respuesta=$("#consultaPro");
+    dibujarTabla(respuesta, respDatos);
+    }
+  });
+
+
+  function dibujarTabla(respuesta, respDatos){
+  respuesta.html("");
+    respuesta.append('<table id="tab" border="1">');
+    var tabla=$("#tab");
+    tabla.html("<tr><caption>Tabla de Productos</caption><th>Id_Producto</th><th>Nombre</th><th>Precio</th><th>Cantidad</th><th>Descripcion</th></tr>");
+    for(var i in respDatos){
+      tabla.append("<tr><td>"+respDatos[i].Id_Producto+"</td>"
+      +"<td>"+respDatos[i].Nombre+"</td>"
+      +"<td>"+respDatos[i].Precio+"</td>"
+      +"<td>"+respDatos[i].Cantidad+"</td>"
+      +"<td>"+respDatos[i].Descripcion+"</td></tr>");
+    }
+    tabla.append("</table>");
+  }
+
+///////////clientes
+  var btnConsulta=$("#cli");
+  btnConsulta.click(function cons(){  
+    $.ajax({
+    type:"POST",
+    url:"consultarCLI.php",
+    data:"",
+    success: consultaDatos2
+    });
+    
+    function consultaDatos2(base){
+    var respDatos2=$.parseJSON(base);   
+    var respuesta2=$("#consultaCli");
+    dibujarTabla2(respuesta2, respDatos2);
+    }
+  });
+
+
+  function dibujarTabla2(respuesta2, respDatos2){
+  respuesta2.html("");
+    respuesta2.append('<table id="tab" border="1">');
+    var tabla=$("#tab");
+    tabla.html("caption>Tabla de Clientes</caption><tr><th>id_Cliente</th><th>Nombre</th><th>Edad</th><th>Direccion</th><th>Telefono</th></tr>");
+    for(var n in respDatos2){
+      tabla.append("<tr><td>"+respDatos2[n].Id_Cliente+"</td>"
+      +"<td>"+respDatos2[n].Nombre+"</td>"
+      +"<td>"+respDatos2[n].Edad+"</td>"
+      +"<td>"+respDatos2[n].Direccion+"</td>"
+      +"<td>"+respDatos2[n].Telefono+"</td></tr>");
+    }
+    tabla.append("</table>");
+  }
+
+
+
+///////////////finalizacion de las consultas
+
+
+  //////consulta la tabla que cambiara el registro
+  var btnConsAct=$("#btnConsAct");
+  btnConsAct.click(function cargarDat(){  
+    $.ajax({
+    type:"POST",
+    url:"consultarPRO.php",
+    data:"",
+    success: cargarDatos
+    });
+    
+    function cargarDatos(datos){   
+      var respCarga=$.parseJSON(datos);       
+      var respConAct=$("#respConAct");      
+      dibujarTabla(respConAct,respCarga);
+    }
+  });
+
+  /////finaliza la tabla que se cambiara el registro
+  
+  ////muestra los datos que se cambiaran de productos
+  var btnCarDatos=$("#btnCarDatos");
+  btnCarDatos.click(function cargarInf(){
+  var Id=parseInt($("#nomActualizar").val());
+    $.ajax({
+    type:"POST",
+    url:"consultaBD2.php",
+    data:"Id="+Id,
+    success: cargarDatosAct
+    });
+    
+    function cargarDatosAct(datos){
+      var consDatAct=$.parseJSON(datos);
+      var respCargDatos=$("#respCargDatos");//Div del resultado para dibujar controles
+      respCargDatos.html("<label>ID:</label><input type='text' id='Id' disabled='yes'>");
+      respCargDatos.append("<label>Nombre:</label><input type='text' id='nom'>");
+      respCargDatos.append("<label>Precio:</label><input type='text' id='pre'>");
+      respCargDatos.append("<label>Cantidad:</label><input type='text' id='can'>");
+      respCargDatos.append("<label>Descripcion:</label><input type='text' id='des'>");
+
+      var Id=$("#Id");
+      var nom=$("#nom");
+      var pre=$("#pre");
+      var can=$("#can");
+      var des=$("#des");
+      for(var i in consDatAct){
+	Id.val(consDatAct[i].Id_Producto);
+	nom.val(consDatAct[i].Nombre);
+	mar.val(consDatAct[i].Precio);
+	pre.val(consDatAct[i].Cantidad);
+	des.val(consDatAct[i].Descripcion);
+      }
+    
+    }
+  });
+  /////////finaliza los datos que se cambiaran
+
+  /////////boton que guarda la actualizacion
+  var btnGuarDatos=$("#btnGuarDatos");
+  btnGuarDatos.click(function actual(){
+    var id=parseInt($("#Id").val());
+    var nombre=$("#nom").val();
+    var precio=$("#pre").val();
+    var cantidad=$("#can").val();
+    var descripcion=$("#des").val();
+  
+    if ( nombre=="" || precio=="" || cantidad=="" || descripcion=="") {
+      alert("Ingresar informacion en todos los campos ");
+    }
+
+    else{
+      $.ajax({
+
+        type:"POST",
+        url:"actualizarPRO.php",
+        data:"id="+id+"&nombre="+nombre+"&precio="+precio+"&cantidad="+cantidad+"&descripcion="+descripcion,
+        success: actualizacion
+        });
+   
+      }
+       function actualizacion(datos){
+        alert("datos:"+datos);
+      }
+  });
+
+///////////////finaliza boton de actualizacion
+
+  /////////boton para eliminar un registros
+
+    var btnConsEliminar=$("#btnConsEliminar");
+  btnConsEliminar.click(function conEliminar(){
+      $.ajax({
+        type:"POST",
+        url:"",
+        data:"",
+        success:consultaAntEliminar
+      });
+      function consultaAntEliminar(datos){
+          var datAntEliminar=$.parseJSON(datos);
+          var respConElim=$("#respConElim");
+        dibujarTabla(respConElim,datAntEliminar);
+      }
+  });
+  var btnEliminar=$("#btnEliminar");
+  btnEliminar.click(function eliminarDato(){
+    var   idEliminar=parseInt($("#idEliminar").val());
+    $.ajax({
+        type:"POST",
+        url:"eliminarPRO.php",
+        data:"Id="+idEliminar,
+        success:Eliminacion
+    });
+    function Eliminacion(datos){
+        alert(datos);
+    }
+  });
+
+  ///////finaliza boton para eliminar un registro
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+////////inicia consulta del id que se cambiara
+     var btnConsCli=$("#btnConsCli");
+  btnConsCli.click(function cargarCli(){  
+    $.ajax({
+    type:"POST",
+    url:"consultarCLI.php",
+    data:"",
+    success: cargarDatos
+    });
+    
+    function cargarDatos(datos){   
+      var respCarga2=$.parseJSON(datos);       
+      var respConAct2=$("#respConCli");      
+      dibujarTabla2(respConAct2,respCarga2);
+    }
+  });
+
+
+////muestra los datos que se cambiaran de id clientes
+
+<!--finaliza boton de actualizacion-->
+
+  
+
+ var btnCarDatos=$("#btnCarDatos2");
+  btnCarDatos.click(function cargarInf(){
+  var Id=parseInt($("#nomActualizar2").val());
+    $.ajax({
+    type:"POST",
+    url:"consultaBD3.php",
+    data:"Id="+Id,
+    success: cargarDatosAct
+    });
+    
+    function cargarDatosAct(datos){
+      var consDatAct2=$.parseJSON(datos);
+      var respCargDatos2=$("#respCargDatos2");//Div del resultado para dibujar controles
+      respCargDatos2.html("<label>ID:</label><input type='text' id='Id' disabled='yes'>");
+      respCargDatos2.append("<label>Nombre:</label><input type='text' id='nom'>");
+      respCargDatos2.append("<label>Edad:</label><input type='text' id='eda'>");
+      respCargDatos2.append("<label>Direccion:</label><input type='text' id='dir'>");
+      respCargDatos2.append("<label>Telefono:</label><input type='text' id='tel'>");
+
+      var Id=$("#Id");
+      var nom=$("#nom");
+      var eda=$("#eda");
+      var dir=$("#dir");
+      var tel=$("#tel");
+      for(var i in consDatAct2){
+  Id.val(consDatAct2[i].Id_Cliente);
+  nom.val(consDatAct2[i].Nombre);
+  dir.val(consDatAct2[i].Edad);
+  cor.val(consDatAct2[i].Direccion);
+  tel.val(consDatAct2[i].Telefono);
+      }
+    
+    }
+  });
+  /////////finaliza los datos que se cambiaran
+
+  /////////boton que guarda la actualizacion
+  var btnGuarClientes=$("#btnGuarDatos2");
+  btnGuarClientes.click(function actualcli(){
+    var id=parseInt($("#Id").val());
+    var nombre=$("#nom").val();
+    var edad=$("#eda").val();
+    var direccion=$("#dir").val();
+    var telefono=$("#tel").val();
+  
+    if ( nombre=="" || edad=="" || direccion=="" || telefono=="") {
+      alert("Ingresar informacion en todos los campos ");
+    }
+
+    else{
+      $.ajax({
+
+        type:"POST",
+        url:"actualizarCLI.php",
+        data:"id="+id+"&nombre="+nombre+"&edad="+edad+"&direccion="+direccion+"&telefono="+telefono,
+        success: actualizacion2
+        });
+   
+      }
+       function actualizacion2(datos){
+        alert("datos:"+datos);
+      }
+  });
+
+
+
+
+  /////////boton para eliminar un registros
+
+    var btnEliminarCli=$("#btnConsEliminar");
+  btnEliminarCli.click(function conEliminar(){
+      $.ajax({
+        type:"POST",
+        url:"",
+        data:"",
+        success:consultaAntEliminar
+      });
+      function consultaAntEliminar(datos){
+          var datAntEliminar=$.parseJSON(datos);
+          var respConElim=$("#respConElim");
+        dibujarTabla(respConElim,datAntEliminar);
+      }
+  });
+  var btnEliminarCli=$("#btnEliminarCli");
+  btnEliminarCli.click(function eliminarDato(){
+    var   idEliminar=parseInt($("#idEliminarCli").val());
+    $.ajax({
+        type:"POST",
+        url:"eliminarCLI.php",
+        data:"Id="+idEliminar,
+        success:Eliminacion
+    });
+    function Eliminacion(datos){
+        alert(datos);
+    }
+  });
+
+  ///////finaliza boton para eliminar un registro
+
+
+
+});
+
+
+</script>
+<style type="text/css">
+p{
+text-align:center;
+}
+
+label{
+  color: purple;
+}
+ul{
+  color: purple;
+}
+a{
+  color: black;
+}
+p{
+ color: blue;
+}
+li{
+ color: blue;
+}
+.ui-page{
+background:transparent url(images/777.jpg);
+}
+</style>
+</head>
+<body>
+<div data-role="page" id="principal">
+  <div data-role="header" >
+    <p>BOTANERO "BENDITO DIOS"</p>
+  </div>
+  <div data-role="content">
+    <div>
+      <ul data-role="listview">
+	<li><a href="#registro" >Registros</a></li>
+	<li><a href="#producto" >Consultar Productos</a></li>
+	<li><a href="#cliente" >Consultar Clientes</a></li>
+	<li><a href="#actualizar" >Actualizar y Eliminar Productos</a></li>
+  <li><a href="#actualizar2" >Actualizar y Eliminar Clientes </a></li>
+      </ul>
+    </div>
+  </div>
+  <div data-role="footer">
+  <p>Derechos reservados</p>
+  </div>
+</div>
+<!--Registro de clientes y productos-->
+<div data-role="page" id="registro">
+  <div data-role="header" >
+    <p>Productos</p>
+  </div>
+  <div data-role="content">
+    <label for="nombre">Nombre:</label>
+    <input type="text" id="nombre">
+    <label for="precio">Precio:</label>
+    <input type="text" id="precio">
+    <label for="cantidad">Cantidad:</label>
+    <input type="text" id="cantidad">
+    <label for="descripcion">Descripcion:</label>
+    <input type="text" id="descripcion">    
+    <input type="button" id="produc" value="Registrar un Producto">
+  </div> <br/> <br/> <br/>
+<div data-role="header" >
+    <p>Clientes</p>
+  </div>
+<div data-role="content">
+    <label for="nombre">Nombre:</label>
+    <input type="text" id="nombre">
+    <label for="edad">Edad:</label>
+    <input type="text" id="edad">
+    <label for="direccion">Direccion:</label>
+    <input type="text" id="direccion">
+    <label for="telefono">Telefono:</label>
+    <input type="text" id="telefono">    
+    <input type="button" id="client" value="Registra un Cliente">
+  </div>
+
+
+  <div data-role="footer">
+  <p>Derechos reservados</p>
+  </div>
+</div>
+<!--Finaliza registro de clientes y productos-->
+
+
+
+<!--Consultas de los registros de clientes y productos-->
+
+<!--productos-->
+<div data-role="page" id="producto">
+  <div data-role="header" >
+    <p>Consultar todos</p>
+  </div>
+  <div data-role="content">
+    <input type="button" id="pro" value="Consultar">
+    <div id="consultaPro"></div>
+  </div>
+ 
+  <div data-role="footer">
+  <p>Derechos reservados</p>
+  </div>
+</div>
+
+
+<!--clientes-->
+<div data-role="page" id="cliente">
+  <div data-role="header" >
+    <p>Consultar todos</p>
+  </div>
+  <div data-role="content">
+    <input type="button" id="cli" value="Consultar">
+    <div id="consultaCli"></div>
+  </div>
+  
+  <div data-role="footer">
+  <p>Derechos reservados</p>
+  </div>
+</div>
+
+
+
+<!--Finalizacion de las consultas de clientes y productos-->
+
+
+<!--Actualizar Registros de Productos-->
+<div data-role="page" id="actualizar">
+  <div data-role="header" >
+    <p>Actualizar Registros </p>
+  </div>
+  <div data-role="content">
+    <input type="button" id="btnConsAct" value="Mostrar todos los registros">
+    <div id="respConAct"></div>
+    <label for="nomActualizar">ID a actualizar</label>
+    <input type="text" id="nomActualizar" >
+    <input type="button" id="btnCarDatos" value="Cargar Datos">
+    <div id="respCargDatos"></div>
+    <input type="button" id="btnGuarDatos" value="Guardar Datos">
+		<br/><br/>
+
+    <!--input type="button" id="btnConsEliminar" value="Mostrar Todos los Registros">
+    <div id="respConElim"> </div-->
+    <label for="idEliminar">ID de Producto a Eliminar</label>
+    <input type="text" id="idEliminar">
+      <input type="button" id="btnEliminar" value="Eliminar Registro">
+  </div>
+
+  
+  <div data-role="footer">
+  <p>Derechos reservados</p>
+  </div>
+</div>
+<!--Finaliza registro de actualizar productos-->
+
+<!--Actualizar Registros de clientes y eliminar-->
+<div data-role="page" id="actualizar2">
+  <div data-role="header" >
+    <p>Actualizar Productos</p>
+  </div>
+  <div data-role="content">
+    <input type="button" id="btnConsCli" value="Mostrar todos los registros">
+    <div id="respConCli"></div>
+
+
+    <label for="nomActualizar2">ID a actualizar</label>
+    <input type="text" id="nomActualizar2" >
+    <input type="button" id="btnCarDatos2" value="Cargar Datos">
+    <div id="respCargDatos2"></div>
+    <input type="button" id="btnGuarDatos2" value="Guardar Datos">
+    <br/><br/>
+
+    <!--input type="button" id="btnConsEliminar" value="Mostrar Todos los Registros">
+    <div id="respConElim"> </div-->
+    <label for="idEliminarCli">ID de Cliente a Eliminar</label>
+    <input type="text" id="idEliminarCli">
+      <input type="button" id="btnEliminarCli" value="Eliminar Registro">
+  </div>
+
+
+
+
+  <div data-role="footer">
+  <p>Derechos reservados</p>
+  </div>
+</div>
+<!--Finaliza registro de actualizar clientes y eliminar-->
+
+
+
+</body>
+</html>
